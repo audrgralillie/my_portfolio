@@ -2,9 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "my_portfolio",
+    "title": "Audrey Lillie",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "Recent graduate from the University of Oregon (2026). BS: Marine Biology, BS: Spatial Data Science, Clark Honors College, Sutherland Lab.\nMy interests include:"
   },
   {
     "objectID": "about.html",
@@ -16,9 +16,9 @@
   {
     "objectID": "portfolio.html",
     "href": "portfolio.html",
-    "title": "About",
+    "title": "Exploratory Census Analysis in Denver, CO",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "These are several analyses that I produced in the course “Spatial Demographics” taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.\n\n1 + 1\n\n[1] 2"
   },
   {
     "objectID": "cv.html",
@@ -26,5 +26,26 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html#about-me",
+    "href": "index.html#about-me",
+    "title": "Audrey Lillie",
+    "section": "",
+    "text": "Write a short paragraph here."
+  },
+  {
+    "objectID": "index.html#research-interests",
+    "href": "index.html#research-interests",
+    "title": "Audrey Lillie",
+    "section": "Research Interests",
+    "text": "Research Interests\nCurrently, I work under Dr. Kelly Sutherland in her lab “Form, Function, and Flow in the Plankton,” researching the zooplanktonic phylum Chaetognatha and their reproductive and morphological distribution in the Northern California Current."
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "Audrey Lillie",
+    "section": "About",
+    "text": "About\nI graduated from the University of Oregon in Spring 2026 with two Bachelors of Science degrees in Marine Biology and Spatial Data Science, and a certificate from the Clark Honors College.\nCurrently, I work under Dr. Kelly Sutherland in her lab “Form, Function, and Flow in the Plankton,” researching the zooplanktonic phylum Chaetognatha and their reproductive and morphological distribution in the Northern California Current."
   }
 ]
