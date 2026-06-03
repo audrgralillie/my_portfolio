@@ -4,5 +4,11 @@
   },
   "about.qmd": {
     "about.html": "ff79bc55"
+  },
+  "cv.qmd": {
+    "cv.html": "fc11bacd"
+  },
+  "portfolio.qmd": {
+    "portfolio.html": "cb2d85ee"
   }
 }

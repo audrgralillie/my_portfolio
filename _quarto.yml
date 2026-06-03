@@ -1,21 +1,27 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  title: "my_portfolio"
+  title: "My Portfolio"
+
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
 
-format:
-  html:
-    theme:
-      - cosmo
-      - brand
-    css: styles.css
-    toc: true
+      - href: portfolio.qmd
+        text: Demographic Change Analyses
 
-editor: visual
+      - href: cv.qmd
+        text: CV
 
+# format:
+#   htm
+#     theme:
+#       - cosmo
+#       - brand
+#     css: styles.css
+#     toc: true
+# 
+# editor: visual
