@@ -16,16 +16,16 @@
   {
     "objectID": "portfolio.html",
     "href": "portfolio.html",
-    "title": "Exploratory Census Analysis in Denver, CO",
+    "title": "Demographic Change in Denver",
     "section": "",
-    "text": "These are several analyses that I produced in the course “Spatial Demographics” taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.\n\n1 + 1\n\n[1] 2"
+    "text": "These are several analyses that I produced in the course “Spatial Demographics” taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons."
   },
   {
     "objectID": "cv.html",
     "href": "cv.html",
-    "title": "About",
+    "title": "Audrey’s CV",
     "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "AudreysCV.html"
   },
   {
     "objectID": "index.html#about-me",
@@ -47,5 +47,12 @@
     "title": "Audrey Lillie",
     "section": "About",
     "text": "About\nI graduated from the University of Oregon in Spring 2026 with two Bachelors of Science degrees in Marine Biology and Spatial Data Science, and a certificate from the Clark Honors College.\nCurrently, I work under Dr. Kelly Sutherland in her lab “Form, Function, and Flow in the Plankton,” researching the zooplanktonic phylum Chaetognatha and their reproductive and morphological distribution in the Northern California Current."
+  },
+  {
+    "objectID": "portfolio.html#young-population-dispersion",
+    "href": "portfolio.html#young-population-dispersion",
+    "title": "Demographic Change in Denver",
+    "section": "“Young” Population Dispersion",
+    "text": "“Young” Population Dispersion"
   }
 ]

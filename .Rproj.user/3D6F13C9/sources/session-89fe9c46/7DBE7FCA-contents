@@ -1,13 +1,53 @@
 ---
-title: "Geog 490: Spatial Demographics"
+title: "Demographic Change in Denver"
+execute:
+  echo: false
+  warning: false
+  message: false
 ---
+
+```{r}
+#| label: setup
+#| include: false
+
+options(tigris_use_cache = TRUE)
+options(tigris_progress = FALSE)
+
+library(tidycensus)
+library(tigris)
+library(tmap)
+library(sf)
+library(dplyr)
+```
 
 These are several analyses that I produced in the course "Spatial Demographics" taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.
 
-```{r}
-1 + 1
-```
+# Introduction
 
----
-title: "Exploratory Census Analysis in Denver, CO"
----
+I chose Denver because...
+
+## "Young" Population Dispersion
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+young_denver <- get_decennial(
+  geography = "tract",
+  variables = "P1_004N",
+  state = "CO",
+  county = "Denver",
+  geometry = TRUE,
+  year = 2020
+)
+
+young_centroids <- st_centroid(young_denver)
+
+tm_shape(young_denver) +
+  tm_polygons(col = "white", border.col = "grey") +
+  tm_shape(young_centroids) +
+  tm_symbols(
+    size = "value",
+    col = "navy"
+  )
+```
