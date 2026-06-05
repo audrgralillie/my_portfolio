@@ -1,0 +1,13 @@
+"0","dtown.tracts <- large.tracts %>%
+  filter(NAME == ""Detroit"") %>%
+  mutate(
+    blklq   = (black / tpop) / (blackc / tpopc),
+    asnlq   = (asian / tpop) / (asianc / tpopc),
+    hisplq  = (hisp / tpop) / (hispc / tpopc),
+    whitelq = (white / tpop) / (whitec / tpopc)
+  )
+"
+"2","G1;H1;Errorh: object 'large.tracts' not found
+Error during wrapup: not that many frames on the stack
+Error: no more error handlers available (recursive errors?); invoking 'abort' restart
+g"

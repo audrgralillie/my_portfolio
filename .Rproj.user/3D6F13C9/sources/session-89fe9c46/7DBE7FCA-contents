@@ -22,6 +22,12 @@ library(ggplot2)
 library(dplyr)
 library(stringr)
 library(tidyverse)
+library(sf)
+library(rmapshaper)
+library(flextable)
+library(segregation)
+
+tmap_mode("plot")
 ```
 
 These are several analyses that I produced in the course "Spatial Demographics" taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.
@@ -55,7 +61,7 @@ Figure 1: ...
 
 Figure 1 evaluates the...
 
-## Population Pyramid
+## Population Pyramid (State of Michigan)
 
 ```{r}
 # get data
@@ -136,7 +142,9 @@ Figure 3: ...
 
 Figure 3 evaluates the...
 
-## Dot Density: Races in Wayne County
+## Race Distribution
+
+### Dot Density
 
 ```{r}
 #| echo: false
@@ -196,3 +204,443 @@ race_map
 Figure 4: Race ethnicity (2020 Census)
 
 In Figure 4, we see
+
+### Faceted
+
+```{r}
+tmap_mode("plot")
+
+detroit_race <- get_decennial(
+  geography = "tract",
+  state = "MI",
+  county = "Wayne",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+
+tm_shape(detroit_race) +
+  tm_facets(by = "variable", ncol = 2, nrow = 3, scale.factor = 4) +
+  tm_fill(
+    col = "percent",
+    style = "quantile",
+    n = 6,
+    palette = "Blues",
+    title = "Percent (2020 US Census)",
+    showNA = FALSE
+  ) +
+  tm_layout(
+    bg.color = "grey",
+    panel.label.bg.color = "white",
+    legend.outside = TRUE,
+    legend.outside.position = "right"
+  )
+```
+
+Figure 5: Race ethnicity (2020 Census)
+
+In Figure 5, we see
+
+## Visualizing Segregation and Gentrification
+
+### Multigroup Segregation Index
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+# Bring in 2019-2023 census tract data using the Census API
+dtown.tracts <- get_acs(geography = "tract",
+                     year = 2023,
+                     variables = c(tpop = "B03002_001",
+                                   white = "B03002_003", black = "B03002_004",
+                                   asian = "B03002_006", hisp = "B03002_012"),
+                     state = "MI",
+                     survey = "acs5",
+                     output = "wide",
+                     geometry = TRUE)
+# Calculate, rename and keep essential vars.
+dtown.tracts <- dtown.tracts %>%
+  mutate(pwhite = 100*(whiteE/tpopE), pasian = 100*(asianE/tpopE),
+         pblack = 100*(blackE/tpopE), phisp = 100*(hispE/tpopE)) %>%
+  rename(white = whiteE, asian = asianE, black = blackE,
+         hisp = hispE, tpop = tpopE) %>%
+  select(GEOID,tpop, pwhite, pasian, pblack, phisp,
+         white, asian, black, hisp)
+# Bring in city boundaries
+mi_pl <- places(state = "MI", year = 2023, cb = TRUE)
+# Keep four large cities in CA
+large.cities <- mi_pl %>%
+  filter(NAME == "Detroit" |
+           NAME == "Grand Rapids" | NAME == "Ann Arbor" |
+           NAME == "Lansing")
+#Clip tracts in large cities
+large.tracts <- ms_clip(target = dtown.tracts,
+                        clip = large.cities,
+                        remove_slivers = TRUE)
+
+# glimpse(large.tracts)
+# names(large.tracts)
+# names(large.cities)
+
+sf::sf_use_s2(FALSE)
+large.tracts <- large.tracts %>%
+  st_join(large.cities)
+sf::sf_use_s2(TRUE)
+#names(large.tracts) # lots of new variables that we don't need
+
+# remove duplicates (ending in .x and .y)
+large.tracts <- large.tracts %>%
+  select(-(STATEFP:GEOIDFQ), -(NAMELSAD:AWATER))
+#names(large.tracts) # check
+
+hisp_map <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  tm_shape() +
+  tm_polygons(fill = "phisp",
+              fill.scale = tm_scale(style = "quantile", values = "reds"),
+              frame = FALSE) +
+  tm_title("Hispanic")
+
+black_map <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  tm_shape() +
+  tm_polygons(fill = "pblack",
+              fill.scale = tm_scale(style = "quantile", values = "reds"),
+              frame = FALSE) +
+  tm_title("Black")
+
+asian_map <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  tm_shape() +
+  tm_polygons(fill = "pasian",
+              fill.scale = tm_scale(style = "quantile", values = "reds"),
+              frame = FALSE) +
+  tm_title("Asian")
+
+white_map <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  tm_shape() +
+  tm_polygons(fill = "pwhite",
+              fill.scale = tm_scale(style = "quantile", values = "reds"),
+              frame = FALSE) +
+  tm_title("White")
+
+tmap_arrange(
+  hisp_map, black_map,
+  asian_map, white_map,
+  ncol = 2
+)
+```
+
+Figure 6:
+
+### Dissimilarity Index:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(sf)
+
+# DROP geometry BEFORE ANY GROUPING
+tract_data <- large.tracts %>%
+  st_drop_geometry()
+
+# totals
+tract_data <- tract_data %>%
+  group_by(NAME) %>%
+  mutate(
+    whitec = sum(white),
+    asianc = sum(asian),
+    blackc = sum(black),
+    hispc  = sum(hisp)
+  ) %>%
+  ungroup()
+
+# contributions
+tract_data <- tract_data %>%
+  mutate(
+    d.wb = abs(black/blackc - white/whitec),
+    d.wa = abs(asian/asianc - white/whitec),
+    d.wh = abs(hisp/hispc - white/whitec)
+  )
+
+# final index (NO sf involved anymore)
+dissimilarity <- tract_data %>%
+  group_by(NAME) %>%
+  summarize(
+    BWD = 0.5 * sum(d.wb, na.rm = TRUE),
+    AWD = 0.5 * sum(d.wa, na.rm = TRUE),
+    HWD = 0.5 * sum(d.wh, na.rm = TRUE)
+  )
+
+dis.table <- flextable(dissimilarity) %>%
+  colformat_double(j = c("BWD", "AWD", "HWD"), digits = 3)
+
+dis.table
+```
+
+Table 1: Dissimilarity Index betwe....
+
+Table 1 shows us that...
+
+### Interaction Index (P\*)
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+large.tracts <- large.tracts %>%
+  group_by(NAME) %>%
+  mutate(
+    whitec = sum(white),
+    asianc = sum(asian),
+    blackc = sum(black),
+    hispc  = sum(hisp),
+    tpopc  = sum(tpop)
+  ) %>%
+  ungroup()
+
+large.tracts <- large.tracts %>%
+  mutate(
+    i.wb = (black / blackc) * (white / tpop),
+    i.wa = (asian / asianc) * (white / tpop),
+    i.wh = (hisp / hispc) * (white / tpop)
+  )
+
+interaction_summary <- large.tracts %>%
+  st_drop_geometry() %>%
+  summarize(
+    BWI = sum(i.wb, na.rm = TRUE),
+    AWI = sum(i.wa, na.rm = TRUE),
+    HWI = sum(i.wh, na.rm = TRUE)
+  )
+
+int.table <- flextable(interaction_summary) %>%
+  colformat_double(j = c("BWI", "AWI", "HWI"), digits = 3)
+
+int.table
+```
+
+Table 2:
+
+Table 2 shows us...
+
+### Location Quotient
+
+```{r}
+# 1. Create LQ values (sf)
+large.tracts <- large.tracts %>%
+  group_by(NAME) %>%
+  mutate(
+    whitec = sum(white),
+    asianc = sum(asian),
+    blackc = sum(black),
+    hispc  = sum(hisp),
+    tpopc  = sum(tpop)
+  ) %>%
+  ungroup()
+
+large.tracts <- large.tracts %>%
+  mutate(
+    i.wb = (black / blackc) * (white / tpop),
+    i.wa = (asian / asianc) * (white / tpop),
+    i.wh = (hisp / hispc) * (white / tpop)
+  )
+
+dtown.tracts <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  mutate(
+    blklq   = (black / tpop) / (blackc / tpopc),
+    asnlq   = (asian / tpop) / (asianc / tpopc),
+    hisplq  = (hisp / tpop) / (hispc / tpopc),
+    whitelq = (white / tpop) / (whitec / tpopc)
+  )
+
+# 2. Histogram (no geometry)
+ggplot(st_drop_geometry(dtown.tracts), aes(blklq)) +
+  geom_histogram(bins = 30)
+```
+
+Figure 7:
+
+Figure 7 tells us that...
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tmap)
+library(dplyr)
+library(tidyr)
+library(sf)
+
+# ----------------------------
+# 1. Ensure correct dataset
+# ----------------------------
+lq_data <- large.tracts %>%
+  filter(NAME == "Detroit") %>%
+  st_as_sf()
+
+# ----------------------------
+# 2. Compute city totals ONCE
+# ----------------------------
+lq_data <- lq_data %>%
+  mutate(
+    whitec = sum(white, na.rm = TRUE),
+    blackc = sum(black, na.rm = TRUE),
+    asianc = sum(asian, na.rm = TRUE),
+    hispc  = sum(hisp,  na.rm = TRUE),
+    tpopc  = sum(tpop,  na.rm = TRUE)
+  )
+
+# ----------------------------
+# 3. Compute Location Quotients
+# ----------------------------
+lq_data <- lq_data %>%
+  mutate(
+    blklq   = (black / tpop) / (blackc / tpopc),
+    asnlq   = (asian / tpop) / (asianc / tpopc),
+    hisplq  = (hisp  / tpop) / (hispc  / tpopc),
+    whitelq = (white / tpop) / (whitec / tpopc)
+  )
+
+# ----------------------------
+# 4. Pivot to long format for faceting
+# ----------------------------
+lq_long <- lq_data %>%
+  select(geometry, blklq, asnlq, hisplq, whitelq) %>%
+  pivot_longer(
+    cols = c(blklq, asnlq, hisplq, whitelq),
+    names_to = "race",
+    values_to = "lq"
+  )
+
+# ----------------------------
+# 5. Plot (2x2 layout)
+# ----------------------------
+tmap_mode("plot")
+
+tm_shape(lq_long) +
+  tm_polygons(
+    fill = "lq",
+    fill.scale = tm_scale(style = "quantile", n = 6),
+    col_alpha = 0
+  ) +
+  tm_facets(by = "race", ncol = 2) +
+  tm_layout(
+    frame = FALSE,
+    legend.outside = TRUE,
+    title = "Location Quotients (Detroit)"
+  )
+```
+
+Figure 8:
+
+Figure 8 shows...
+
+## Final Segregation Index
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| results: hide
+library(tidycensus)
+library(tidyverse)
+library(segregation)
+library(tigris)
+library(sf)
+
+# Get Michigan tract data by race/ethnicity
+mi_acs_data <- get_acs(
+  geography = "tract",
+  variables = c(
+    white = "B03002_003",
+    black = "B03002_004",
+    asian = "B03002_006",
+    hispanic = "B03002_012"
+  ),
+  state = "MI",
+  geometry = TRUE,
+  year = 2019)
+
+# Use tidycensus to get urbanized areas by population with geometry,
+# then filter for those that have populations of 750,000 or more
+us_urban_areas <- get_acs(
+  geography = "urban area",
+  variables = "B01001_001",
+  geometry = TRUE,
+  year = 2019,
+  survey = "acs1"
+) %>%
+  filter(estimate >= 750000) %>%
+  transmute(urban_name = str_remove(NAME,
+                                    fixed(", MI Urbanized Area (2010)")))
+# Compute an inner spatial join between the California tracts and the
+# urbanized areas, returning tracts in the largest California urban
+# areas with the urban_name column appended
+mi_urban_data <- mi_acs_data %>%
+  st_join(us_urban_areas, left = FALSE) %>%
+  select(-NAME) %>%
+  st_drop_geometry()
+
+
+# Dissimilarity index: D
+mi_urban_data %>%
+  filter(variable %in% c("white", "hispanic"),
+         urban_name == "Detroit") %>% dissimilarity(
+           group = "variable",
+           unit = "GEOID",
+           weight = "estimate")
+mi_urban_data %>%
+  filter(variable %in% c("white", "hispanic")) %>%
+  group_by(urban_name) %>%
+  group_modify(~
+                 dissimilarity(.x,
+                               group = "variable",
+                               unit = "GEOID",
+                               weight = "estimate"
+                 )) %>%
+  arrange(desc(est))
+
+# multi-group segregation indices
+mutual_within(
+  data = mi_urban_data,
+  group = "variable",
+  unit = "GEOID",
+  weight = "estimate",
+  within = "urban_name",
+  wide = TRUE)
+detroit_local_seg <- mi_urban_data %>%
+  filter(urban_name == "Detroit") %>%
+  mutual_local(
+    group = "variable",
+    unit = "GEOID",
+    weight = "estimate",
+    wide = TRUE
+  )
+detroit_tracts_seg <- tracts("MI", cb = TRUE, year = 2019) %>%
+  inner_join(detroit_local_seg, by = "GEOID")
+detroit_tracts_seg %>%
+  ggplot(aes(fill = ls)) + #
+  geom_sf(color = NA) +
+  coord_sf(crs = 26946) +
+  scale_fill_viridis_c(option = "mako", direction = -1) +
+  theme_void() +
+  labs(fill = "Local\nsegregation index")
+```
+
+Figure 9:
