@@ -16,7 +16,7 @@
   {
     "objectID": "portfolio.html",
     "href": "portfolio.html",
-    "title": "Demographic Change in Denver",
+    "title": "Demographic Change in Detroit, MI (Wayne County)",
     "section": "",
     "text": "These are several analyses that I produced in the course “Spatial Demographics” taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons."
   },
@@ -51,8 +51,36 @@
   {
     "objectID": "portfolio.html#young-population-dispersion",
     "href": "portfolio.html#young-population-dispersion",
-    "title": "Demographic Change in Denver",
+    "title": "Demographic Change in Detroit",
     "section": "“Young” Population Dispersion",
-    "text": "“Young” Population Dispersion"
+    "text": "“Young” Population Dispersion\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3: …\nFigure 3 evaluates the…"
+  },
+  {
+    "objectID": "portfolio.html#population-dispersion",
+    "href": "portfolio.html#population-dispersion",
+    "title": "Demographic Change in Detroit, MI (Wayne County)",
+    "section": "Population Dispersion",
+    "text": "Population Dispersion\n\n\n\n\n\n\n\n\n\nFigure 1: …\nFigure 1 evaluates the…"
+  },
+  {
+    "objectID": "portfolio.html#population-pyramid",
+    "href": "portfolio.html#population-pyramid",
+    "title": "Demographic Change in Detroit, MI (Wayne County)",
+    "section": "Population Pyramid",
+    "text": "Population Pyramid\n\n\n\n\n\n\n\n\n\nFigure 2: …\nFigure 2 evaluates the…"
+  },
+  {
+    "objectID": "portfolio.html#young-population-dispersion-age-18",
+    "href": "portfolio.html#young-population-dispersion-age-18",
+    "title": "Demographic Change in Detroit, MI (Wayne County)",
+    "section": "“Young” Population Dispersion (age < 18)",
+    "text": "“Young” Population Dispersion (age &lt; 18)\n\n\n\n\n\n\n\n\n\nFigure 3: …\nFigure 3 evaluates the…"
+  },
+  {
+    "objectID": "portfolio.html#dot-density-races-in-wayne-county",
+    "href": "portfolio.html#dot-density-races-in-wayne-county",
+    "title": "Demographic Change in Detroit, MI (Wayne County)",
+    "section": "Dot Density: Races in Wayne County",
+    "text": "Dot Density: Races in Wayne County\n\n\n[1] 765\n\n\n\n\n\n\n\n\n\nFigure 5: Race ethnicity (2020 Census)\nIn Figure 5, we see"
   }
 ]

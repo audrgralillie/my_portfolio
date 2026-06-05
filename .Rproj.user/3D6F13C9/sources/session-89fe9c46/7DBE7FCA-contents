@@ -1,5 +1,5 @@
 ---
-title: "Demographic Change in Denver"
+title: "Demographic Change in Detroit, MI (Wayne County)"
 execute:
   echo: false
   warning: false
@@ -18,36 +18,181 @@ library(tigris)
 library(tmap)
 library(sf)
 library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(stringr)
+library(tidyverse)
 ```
 
 These are several analyses that I produced in the course "Spatial Demographics" taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.
 
 # Introduction
 
-I chose Denver because...
+I chose Detroit because...
 
-## "Young" Population Dispersion
+## Population Dispersion
+
+```{r}
+options(tigris_use_cache = TRUE)
+detroit_pop <- get_acs(
+  geography = "tract",
+  variables = "B01003_001", # population
+  state = "MI",
+  county = "Wayne",
+  year = 2020,
+  geometry = TRUE
+)
+
+ggplot(detroit_pop) +
+  geom_sf(aes(fill = estimate)) +
+  #scale_fill_viridis_c(labels = scales::label_dollar()) +
+  scale_fill_viridis_c(option = "mako") +
+  theme_void() +
+  labs(fill = "Population")
+```
+
+Figure 1: ...
+
+Figure 1 evaluates the...
+
+## Population Pyramid
+
+```{r}
+# get data
+michigan <- get_estimates(
+  geography = "state",
+  state = "MI",
+  product = "characteristics",
+  breakdown = c("SEX", "AGEGROUP"),
+  breakdown_labels = TRUE,
+  year = 2019)
+
+# filter out "both sexes"
+michigan_filtered <- michigan %>%
+  filter(str_detect(AGEGROUP, "^Age \\d+ to \\d+ years$"),
+         SEX %in% c("Male", "Female")) %>%
+  mutate(population = ifelse(SEX == "Male", -value, value))
+
+# order ages
+michigan_filtered <- michigan_filtered %>%
+  mutate(age_start = as.numeric(str_extract(AGEGROUP, "\\d+"))) %>%
+  arrange(age_start)
+
+michigan_filtered$AGEGROUP <- factor(
+  michigan_filtered$AGEGROUP,
+  levels = unique(michigan_filtered$AGEGROUP))
+#plot
+options(scipen = 999)
+michigan__pyramid <- ggplot(michigan_filtered,
+                            aes(x = AGEGROUP, y = population, fill = SEX)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = abs) +
+  scale_x_discrete(labels = ~ str_remove_all(.x, "Age\\s|\\syears")) +
+  scale_fill_manual(values = c("#A9BC7E", "#82B5C4")) +
+  labs(
+    x = "Age Group",
+    y = "Population",
+    title = "2019 Population Structure in Michigan",
+    caption = "Source: US Census Bureau"
+  ) +
+  theme_minimal()
+michigan__pyramid
+```
+
+Figure 2: ...
+
+Figure 2 evaluates the...
+
+## "Young" Population Dispersion (age \< 18)
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-young_denver <- get_decennial(
+young_detroit <- get_decennial(
   geography = "tract",
   variables = "P1_004N",
-  state = "CO",
-  county = "Denver",
+  state = "MI",
+  county = "Wayne",
   geometry = TRUE,
   year = 2020
 )
 
-young_centroids <- st_centroid(young_denver)
+young_det_centroids <- st_centroid(young_detroit)
 
-tm_shape(young_denver) +
-  tm_polygons(col = "white", border.col = "grey") +
-  tm_shape(young_centroids) +
-  tm_symbols(
-    size = "value",
-    col = "navy"
+# map it
+tm_shape(young_detroit) +
+  tm_polygons(
+    col = "value", 
+    palette = "Purples", 
+    style = "quantile", # Groups data evenly
+    border.col = "white", 
+    title = "Youth Percentage"
   )
 ```
+
+Figure 3: ...
+
+Figure 3 evaluates the...
+
+## Dot Density: Races in Wayne County
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+# dot-density maps
+tmap_mode("plot")
+detroit_race <- get_decennial(
+  geography = "tract",
+  state = "MI",
+  county = "Wayne",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+
+detroit_race <- detroit_race %>%
+  filter(value >= 100)
+
+detroit_dots <- detroit_race %>%
+  as_dot_density(
+    value = "value",
+    values_per_dot = 2000,
+    group = "variable"
+  )
+
+background_tracts <- filter(detroit_race, variable == "White")
+
+tmap_mode("plot")
+
+tm_shape(background_tracts) +
+  tm_polygons() +
+  tm_shape(detroit_dots) +
+  tm_dots()
+
+race_map <- tm_shape(background_tracts) +
+  tm_polygons(col = "white",
+              border.col = "grey") +
+  tm_shape(detroit_dots) +
+  tm_dots(col = "variable",
+          palette = "Set1",
+          size = 0.1,
+          title = "1 dot = 100 people") +
+  tm_layout(title = "",
+            legend.position = c("right","bottom"))
+race_map
+```
+
+Figure 4: Race ethnicity (2020 Census)
+
+In Figure 4, we see
