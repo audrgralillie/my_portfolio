@@ -73,6 +73,8 @@ ggplot(detroit_pop) +
   labs(fill = "Population")
 ```
 
+This data is from the 1-year ACS survey (2019). Population is organized by census tract—small, relatively permanent subdivisions of counties defined by the U.S. Census Bureau to contain between 1,200 and 8,000 residents. There are 297 tracts in Detroit, Michigan, and several hundred more in the entirety of Wayne County, MI.
+
 ## Population Pyramid (State of Michigan)
 
 ```{r}
@@ -117,6 +119,8 @@ michigan__pyramid <- ggplot(michigan_filtered,
   theme_minimal()
 michigan__pyramid
 ```
+
+This data is also from the 2019 ACS survey (2019). Population is organized by four-year age groups—big enough to avoid 84 rows on this pyramid, but small enough to still visualize the dispersion of ages.
 
 ## "Young" Population Dispersion (age \< 18)
 
