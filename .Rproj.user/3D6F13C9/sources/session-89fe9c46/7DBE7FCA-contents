@@ -30,11 +30,27 @@ library(segregation)
 tmap_mode("plot")
 ```
 
-These are several analyses that I produced in the course "Spatial Demographics" taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year) produced on either personally-chosen or other reasons.
+These are several analyses that I produced in the course "Spatial Demographics" taught by Billy Southern at the University of Oregon, Spring 2026. These analyses integrate information related to Census data (both ACS and 10-year).
 
 # Introduction
 
-I chose Detroit because...
+I chose Detroit because it's a city I've been familiar with my entire life: D-Town! More importantly, though, Detroit has an impressive history of segregation, enforced through the system: discriminatory housing covenants, redlining, and physical barriers. Federal politics sustained this structural inequality, and although many practices have passed, the memories of a segregated community thrive.
+
+-   **Restrictive Covenants:** By 1940, roughly 80% of Detroit's residential properties had legally binding contracts that allowed African Americans from owning or occupying homes.
+
+-   **Redlining:** The Home Owners' Loan Corporation (HOLC) and Federal Housing Administration (FHA) marked neighborhoods with large Black populations as "hazardous," denying them mortgages and home improvement loans.
+
+-   **The Birwood Wall:** In 1941, to secure federal funding for an all-white housing development, a developer built a six-foot concrete wall to separate new white homes from the neighboring Black community.
+
+-   **Highway Construction:** in the 1950s and 1960s, city planners routed the Chrysler and I-75 highways directly through the heart of thriving Black districts (Paradise Valley, Black Bottom). This displaced thousands, and destroyed their wealth.
+
+-   **The Sojourner Truth Riots (1942):** When the federal government attempted to open a housing project for Black war workers in a white neighborhood, the KKK and violent mobs protested, resulting in police arresting hundreds of *Black* residents.
+
+-   **1943, 1967 Riots:** Decades of severe overcrowding, police brutality, and housing segregation resulted in boiling social tensions and major rebellions in these years.
+
+-   Following the 1967 civil unrest, there was a massive out-migration of white residents to the suburbs, leaving the city center with a heavily concentrated Black population (and depleting much of its tax base).
+
+-   **School Segregation (1974):** Civil rights advocates pushed for a metro-wide school bus system to desegregate the city and suburbs. However, the U.S. Supreme Court ruled this down in *Milliken v. Bradley*, ensuring that Detroit's heavily Black school system remained completely separated from predominantly white suburban districts.
 
 ## Population Dispersion
 
@@ -56,10 +72,6 @@ ggplot(detroit_pop) +
   theme_void() +
   labs(fill = "Population")
 ```
-
-Figure 1: ...
-
-Figure 1 evaluates the...
 
 ## Population Pyramid (State of Michigan)
 
@@ -106,10 +118,6 @@ michigan__pyramid <- ggplot(michigan_filtered,
 michigan__pyramid
 ```
 
-Figure 2: ...
-
-Figure 2 evaluates the...
-
 ## "Young" Population Dispersion (age \< 18)
 
 ```{r}
@@ -137,10 +145,6 @@ tm_shape(young_detroit) +
     title = "Youth Percentage"
   )
 ```
-
-Figure 3: ...
-
-Figure 3 evaluates the...
 
 ## Race Distribution
 
@@ -201,10 +205,6 @@ race_map <- tm_shape(background_tracts) +
 race_map
 ```
 
-Figure 4: Race ethnicity (2020 Census)
-
-In Figure 4, we see
-
 ### Faceted
 
 ```{r}
@@ -245,13 +245,9 @@ tm_shape(detroit_race) +
   )
 ```
 
-Figure 5: Race ethnicity (2020 Census)
-
-In Figure 5, we see
-
 ## Visualizing Segregation and Gentrification
 
-### Multigroup Segregation Index
+### Multi-group Segregation Index
 
 ```{r}
 #| echo: false
@@ -341,8 +337,6 @@ tmap_arrange(
 )
 ```
 
-Figure 6:
-
 ### Dissimilarity Index:
 
 ```{r}
@@ -390,9 +384,7 @@ dis.table <- flextable(dissimilarity) %>%
 dis.table
 ```
 
-Table 1: Dissimilarity Index betwe....
-
-Table 1 shows us that...
+Dissimilarity Indices are widely used demographic metrics that measure the evennes with which two distinct groups are distributed across a geography. It ranges from 0 to 1, where a 0 = complete integration and 1 = complete segregation.
 
 ### Interaction Index (P\*)
 
@@ -433,11 +425,9 @@ int.table <- flextable(interaction_summary) %>%
 int.table
 ```
 
-Table 2:
+The interaction index is a metric used to measure the probability of contact or exposure between two distinct groups (such as demographic populations) across residential or social zones.
 
-Table 2 shows us...
-
-### Location Quotient
+## Location Quotient
 
 ```{r}
 # 1. Create LQ values (sf)
@@ -469,13 +459,38 @@ dtown.tracts <- large.tracts %>%
   )
 
 # 2. Histogram (no geometry)
-ggplot(st_drop_geometry(dtown.tracts), aes(blklq)) +
-  geom_histogram(bins = 30)
+dtown_long <- dtown.tracts %>%
+  st_drop_geometry() %>%
+  select(blklq, asnlq, hisplq, whitelq) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "race",
+    values_to = "lq"
+  ) %>%
+  # Clean up the labels and set the order for the 2x2 grid
+  mutate(race = factor(race, 
+                       levels = c("whitelq", "blklq", "hisplq", "asnlq"),
+                       labels = c("White Population LQ", "Black Population LQ", 
+                                  "Hispanic Population LQ", "Asian Population LQ")))
+
+# 2. Plot using facet_wrap
+ggplot(dtown_long, aes(x = lq)) +
+  geom_histogram(bins = 30, fill = "#6596C9", color = "black", alpha = 0.7) +
+  # nrow = 2 and ncol = 2 forces the 2x2 grid layout
+  facet_wrap(~race, nrow = 2, ncol = 2, scales = "free_y") + 
+  labs(
+    x = "Location Quotient (LQ)", 
+    y = "Count",
+    title = ""
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold", size = 11), # Makes facet titles bold
+    panel.spacing = unit(1, "lines")                   # Adds a bit of breathing room between plots
+  )
 ```
 
-Figure 7:
-
-Figure 7 tells us that...
+The location quotient is a statistical ratio used in economic geography to measure how concentrated an industry, occupation, or demographic is in a specific region compared to a broader benchmark (i.e., the national average). If LQ = 1.0, the region is equally concentrated in that industry compared to the nation; it is economically diverse. If LQ \> 1.0, the industry is more concentrated in the region than in the nation. If LQ \< 1.0, the industry is less concentrated locally than at the national level
 
 ```{r}
 #| echo: false
@@ -526,7 +541,11 @@ lq_long <- lq_data %>%
     cols = c(blklq, asnlq, hisplq, whitelq),
     names_to = "race",
     values_to = "lq"
-  )
+  ) %>%
+  # NEW: Convert the "race" column to a factor with human-readable labels
+  mutate(race = factor(race, 
+                       levels = c("whitelq", "blklq", "hisplq", "asnlq"),
+                       labels = c("White LQ", "Black LQ", "Hispanic LQ", "Asian LQ")))
 
 # ----------------------------
 # 5. Plot (2x2 layout)
@@ -536,20 +555,16 @@ tmap_mode("plot")
 tm_shape(lq_long) +
   tm_polygons(
     fill = "lq",
-    fill.scale = tm_scale(style = "quantile", n = 6),
+    fill.scale = tm_scale(style = "quantile", n = 6, label = "Location Quotient"), # name legend
     col_alpha = 0
   ) +
   tm_facets(by = "race", ncol = 2) +
   tm_layout(
     frame = FALSE,
-    legend.outside = TRUE,
-    title = "Location Quotients (Detroit)"
+    legend.outside = FALSE,
+    title = ""
   )
 ```
-
-Figure 8:
-
-Figure 8 shows...
 
 ## Final Segregation Index
 
@@ -642,5 +657,3 @@ detroit_tracts_seg %>%
   theme_void() +
   labs(fill = "Local\nsegregation index")
 ```
-
-Figure 9:
