@@ -152,6 +152,8 @@ tm_shape(young_detroit) +
 
 ## Race Distribution
 
+Data taken from the 10-year United States Census (2020). Each dot represents 2000 people.
+
 ### Dot Density
 
 ```{r}
@@ -210,6 +212,8 @@ race_map
 ```
 
 ### Faceted
+
+Density of five main races in Detroit: Hispanic, Black, Native American, White, and Asian.
 
 ```{r}
 tmap_mode("plot")
