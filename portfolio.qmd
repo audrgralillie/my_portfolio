@@ -40,15 +40,29 @@ I chose Detroit because it's a city I've been familiar with my entire life: D-To
 
 -   **Redlining:** The Home Owners' Loan Corporation (HOLC) and Federal Housing Administration (FHA) marked neighborhoods with large Black populations as "hazardous," denying them mortgages and home improvement loans.
 
+    The HOLC defined each grade as the following:
+
+    -   A: "Best." Typically new, affluent, homogenous, and safest for banks.
+
+    -   B: "Still Desirable." Stable neighborhoods with a low risk of decline.
+
+    -   C: "Definitely Declining." Often featured aging housing stock or populations that lenders considered less stable.
+
+    -   D: "Hazardous." Systematically declined investment. Almost always low-income communities or neighborhoods with Black, immigrant, and Jewish residents.
+
+        ![1935-1940 HOLC Housing Grades](detroit_holc.png){fig-align="center" width="70%"}
+
 -   **The Birwood Wall:** In 1941, to secure federal funding for an all-white housing development, a developer built a six-foot concrete wall to separate new white homes from the neighboring Black community.
 
 -   **Highway Construction:** in the 1950s and 1960s, city planners routed the Chrysler and I-75 highways directly through the heart of thriving Black districts (Paradise Valley, Black Bottom). This displaced thousands, and destroyed their wealth.
 
 -   **The Sojourner Truth Riots (1942):** When the federal government attempted to open a housing project for Black war workers in a white neighborhood, the KKK and violent mobs protested, resulting in police arresting hundreds of *Black* residents.
 
--   **1943, 1967 Riots:** Decades of severe overcrowding, police brutality, and housing segregation resulted in boiling social tensions and major rebellions in these years.
+-   **1943, 1967 Riots:** Decades of severe overcrowding, police brutality, and housing segregation resulted in boiling social tensions and major rebellions in these years. Arson, looting, and other forms of destruction caused massive damage to neighborhoods and homes during the 1967 Detroit Uprising. Upwards of 552 buildings burned during six days in July 1967, including 102 residences.
 
--   Following the 1967 civil unrest, there was a massive out-migration of white residents to the suburbs, leaving the city center with a heavily concentrated Black population (and depleting much of its tax base).
+    ![](detroit_1967.png){fig-align="center" width="100%"}
+
+-   Following the 1967 Detroit Uprising, there was a massive out-migration of white residents to the suburbs, leaving the city center with a heavily concentrated Black population (and depleting much of its tax base).
 
 -   **School Segregation (1974):** Civil rights advocates pushed for a metro-wide school bus system to desegregate the city and suburbs. However, the U.S. Supreme Court ruled this down in *Milliken v. Bradley*, ensuring that Detroit's heavily Black school system remained completely separated from predominantly white suburban districts.
 
